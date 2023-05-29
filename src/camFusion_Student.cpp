@@ -12,8 +12,7 @@ using namespace std;
 
 
 // Create groups of Lidar points whose projection into the camera falls into the same bounding box
-void
-clusterLidarWithROI(std::vector<BoundingBox> &boundingBoxes, std::vector<LidarPoint> &lidarPoints, float shrinkFactor,
+void clusterLidarWithROI(std::vector<BoundingBox> &boundingBoxes, std::vector<LidarPoint> &lidarPoints, float shrinkFactor,
                     cv::Mat &P_rect_xx, cv::Mat &R_rect_xx, cv::Mat &RT) {
     // loop over all Lidar points and associate them to a 2D bounding box
     cv::Mat X(4, 1, cv::DataType<double>::type);
@@ -125,7 +124,6 @@ void show3DObjects(std::vector<BoundingBox> &boundingBoxes, cv::Size worldSize, 
         cv::waitKey(0); // wait for key to be pressed
     }
 }
-
 
 // associate a given bounding box with the keypoints it contains
 void clusterKptMatchesWithROI(BoundingBox &boundingBox,

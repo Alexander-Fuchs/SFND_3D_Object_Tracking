@@ -1,5 +1,17 @@
 # Report
 
+## FP.1 Match 3D Objects
+Done in `src/camFusion_Student.cpp` at `matchBoundingBoxes`.
+
+## FP.2 Compute Lidar-based TTC
+Done in `src/camFusion_Student.cpp` at `computeTTCLidar`.
+
+## FP.3 Associate Keypoint Correspondences with Bounding Boxes
+Done in `src/camFusion_Student.cpp` at `clusterLidarWithROI`.
+
+## FP.4 Compute Camera-based TTC
+Done in `src/camFusion_Student.cpp` at `computeTTCCamera`.
+
 ## FP.5 : Performance Evaluation 1
 
 In my analyss, I observed certain inaccuracies in the Lidar-based Time-to-Collision (TTC) estimations. By manually estimating the distance to the preceding vehicle from the Lidar points, I found discrepancies between my estimates and the calculated Lidar TTC.
