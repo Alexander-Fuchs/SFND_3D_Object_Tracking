@@ -45,7 +45,8 @@ void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource, std::vector<cv::Key
 }
 
 // Use one of several types of state-of-art descriptors to uniquely identify keypoints
-void descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descriptors, string descriptorType, bool silent) {
+void
+descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descriptors, string descriptorType, bool silent) {
     // select appropriate descriptor
     cv::Ptr<cv::DescriptorExtractor> extractor;
     if (descriptorType.compare("BRISK") == 0) {
@@ -102,7 +103,8 @@ void detKeypointsShiTomasi(vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool b
     }
     t = ((double) cv::getTickCount() - t) / cv::getTickFrequency();
     if (!silent) {
-        cout << "Shi-Tomasi detection with n=" << keypoints.size() << " keypoints in " << 1000 * t / 1.0 << " ms" << endl;
+        cout << "Shi-Tomasi detection with n=" << keypoints.size() << " keypoints in " << 1000 * t / 1.0 << " ms"
+             << endl;
     }
 
     // visualize results
@@ -140,7 +142,7 @@ void detKeypointsHarris(vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool bVis
                 newKeyPoint.size = 2 * apertureSize;
                 newKeyPoint.response = response;
                 bool bOverlap = false;
-                for (auto & keypoint : keypoints) {
+                for (auto &keypoint: keypoints) {
                     double kptOverlap = cv::KeyPoint::overlap(newKeyPoint, keypoint);
                     if (kptOverlap > maxOverlap) {
                         bOverlap = true;

@@ -33,20 +33,6 @@ int main(int argc, const char *argv[]) {
         detectorType = argv[1];
         descriptorType = argv[2];
         metricsRun = true;
-        // Incompatible combinations
-        if ((detectorType == "SHITOMASI" && descriptorType == "SIFT") ||
-            (detectorType == "HARRIS" && descriptorType == "SIFT") ||
-            (detectorType == "HARRIS" && descriptorType == "FREAK") ||
-            (detectorType == "HARRIS" && descriptorType == "BRISK") ||
-            (detectorType == "FAST" && descriptorType == "SIFT") ||
-            (detectorType == "BRISK" && descriptorType == "SIFT") ||
-            (detectorType == "ORB" && descriptorType == "SIFT") ||
-            (detectorType == "AKAZE" && descriptorType == "SIFT") ||
-            (detectorType == "SIFT" && descriptorType == "SIFT") ||
-            (detectorType == "SIFT" && descriptorType == "ORB")) {
-            std::cout << 0 << std::endl;
-            return 0;
-        }
     }
 
     // data location
@@ -264,7 +250,7 @@ int main(int argc, const char *argv[]) {
             vector <cv::DMatch> matches;
             string matcherType = "MAT_BF";      // MAT_BF, MAT_FLANN
             string descType = "DES_BINARY";     // DES_BINARY, DES_HOG
-            string selectorType = "SEL_KNN";    // SEL_NN, SEL_KNN
+            string selectorType = "SEL_NN";     // SEL_NN, SEL_KNN
 
             matchDescriptors((dataBuffer.end() - 2)->keypoints, (dataBuffer.end() - 1)->keypoints,
                              (dataBuffer.end() - 2)->descriptors, (dataBuffer.end() - 1)->descriptors,

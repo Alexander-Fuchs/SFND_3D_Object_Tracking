@@ -14,6 +14,33 @@ using namespace std;
 // Create groups of Lidar points whose projection into the camera falls into the same bounding box
 void clusterLidarWithROI(std::vector<BoundingBox> &boundingBoxes, std::vector<LidarPoint> &lidarPoints, float shrinkFactor,
                     cv::Mat &P_rect_xx, cv::Mat &R_rect_xx, cv::Mat &RT) {
+    // Remove outliers with a standard deviation filter
+    double mean_x = 0, mean_y = 0, mean_z = 0, stddev_x = 0, stddev_y = 0, stddev_z = 0;
+    int nPoints = lidarPoints.size();
+    for (auto &point: lidarPoints) {
+        mean_x += point.x;
+        mean_y += point.y;
+        mean_z += point.z;
+    }
+    mean_x /= nPoints;
+    mean_y /= nPoints;
+    mean_z /= nPoints;
+    for (auto &point: lidarPoints) {
+        stddev_x += (point.x - mean_x) * (point.x - mean_x);
+        stddev_y += (point.y - mean_y) * (point.y - mean_y);
+        stddev_z += (point.z - mean_z) * (point.z - mean_z);
+    }
+    stddev_x = sqrt(stddev_x / nPoints);
+    stddev_y = sqrt(stddev_y / nPoints);
+    stddev_z = sqrt(stddev_z / nPoints);
+    lidarPoints.erase(
+        remove_if(lidarPoints.begin(), lidarPoints.end(), [&](LidarPoint const &point) {
+            return (abs(point.x - mean_x) > 2 * stddev_x) ||
+                   (abs(point.y - mean_y) > 2 * stddev_y) ||
+                   (abs(point.z - mean_z) > 2 * stddev_z);
+        }),
+        lidarPoints.end());
+
     // loop over all Lidar points and associate them to a 2D bounding box
     cv::Mat X(4, 1, cv::DataType<double>::type);
     cv::Mat Y(3, 1, cv::DataType<double>::type);
@@ -130,11 +157,24 @@ void clusterKptMatchesWithROI(BoundingBox &boundingBox,
                               const std::vector<cv::KeyPoint> &kptsPrev,
                               const std::vector<cv::KeyPoint> &kptsCurr,
                               const std::vector<cv::DMatch> &kptMatches) {
+    std::vector<double> pairwiseDistances;
+    std::vector<cv::DMatch> validMatches;
     for (const auto &match: kptMatches) {
-        const cv::KeyPoint &prevKpt = kptsPrev.at(match.queryIdx);
-        const cv::KeyPoint &currKpt = kptsCurr.at(match.trainIdx);
-        if (boundingBox.roi.contains(prevKpt.pt) && boundingBox.roi.contains(currKpt.pt)) {
-            boundingBox.kptMatches.push_back(match);
+        auto &currentKeypoint = kptsCurr[match.trainIdx];
+        auto &previousKeypoint = kptsPrev[match.queryIdx];
+        if (boundingBox.roi.contains(currentKeypoint.pt)) {
+            double pairwiseDist = cv::norm(currentKeypoint.pt - previousKeypoint.pt);
+            pairwiseDistances.push_back(pairwiseDist);
+            validMatches.push_back(match);
+        }
+    }
+    int numPairs = pairwiseDistances.size();
+    double meanPairwiseDist = std::accumulate(pairwiseDistances.begin(), pairwiseDistances.end(), 0.0) / numPairs;
+    double distanceThreshold = meanPairwiseDist * 1.3;
+    for (int i = 0; i < numPairs; i++) {
+        if (pairwiseDistances[i] < distanceThreshold) {
+            boundingBox.keypoints.push_back(kptsCurr[validMatches[i].trainIdx]);
+            boundingBox.kptMatches.push_back(validMatches[i]);
         }
     }
 }
